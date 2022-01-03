@@ -1,0 +1,32 @@
+from shutil import copyfile
+import os
+
+
+imgFolder = './imgs'
+cleanFolder = './relabel_imgs'
+washList = './relabel_list_128Vec_T058.txt'
+
+wlFile = open(washList, 'r')
+goodFiles = wlFile.readlines()
+goodFiles = [f.strip('\n ') for f in goodFiles]
+goodFiles = [f.strip('\r ') for f in goodFiles]
+
+count = 0
+for goodFile in goodFiles:
+    label, filename = goodFile.split(' ')
+    filepath = os.path.join(imgFolder, filename)
+
+    if os.path.exists(filepath):
+        count += 1
+
+        cleanpath = os.path.join(cleanFolder, label)
+        if not os.path.exists(cleanpath):
+            os.makedirs(cleanpath)
+            # print("makedirs {}".format(cleanpath))
+        cleanpath = os.path.join(cleanpath, filename.split('/')[-1])
+
+        copyfile(src=filepath, dst=cleanpath)
+        # print(count)
+
+    if count % 1000 == 0:
+        print("Relabel {} images".format(count))
